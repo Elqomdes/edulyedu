@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 function CorporateHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -15,14 +16,43 @@ function CorporateHeader() {
       setIsScrolled(scrollTop > 10);
     };
 
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+
+    // Initial check
+    handleResize();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  // Touch event handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Prevent default touch behavior for better UX
+    if (isMobile) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // Add slight delay for better touch feedback
+    if (isMobile) {
+      setTimeout(() => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+      }, 50);
+    }
+  };
 
   const navLinks = [
     { href: "/", label: "Ana Sayfa" },
@@ -67,7 +97,14 @@ function CorporateHeader() {
         <button
           className={`mobile-menu-btn ${isMobileMenuOpen ? 'active' : ''}`}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           aria-label="Toggle Menu"
+          style={{
+            minHeight: isMobile ? '44px' : 'auto',
+            minWidth: isMobile ? '44px' : 'auto',
+            touchAction: 'manipulation'
+          }}
         >
           <span className="hamburger-line"></span>
           <span className="hamburger-line"></span>

@@ -5,6 +5,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Eduly Eğitim Teknolojileri",
   description: "Eğitim teknolojileri alanında yenilikçi çözümler sunan lider firma",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({
