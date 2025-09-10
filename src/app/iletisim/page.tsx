@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Iletisim() {
@@ -12,6 +12,21 @@ export default function Iletisim() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+
+  // Toast mesajlarını otomatik kapat
+  useEffect(() => {
+    if (showSuccessToast) {
+      const timer = setTimeout(() => setShowSuccessToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+    if (showErrorToast) {
+      const timer = setTimeout(() => setShowErrorToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessToast, showErrorToast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,13 +35,18 @@ export default function Iletisim() {
     try {
       console.log("Form submitted:", formData);
       setFormData({ name: "", email: "", subject: "", message: "" });
-      alert("Mesajınız gönderildi! En kısa sürede size dönüş yapacağız.");
+      setShowSuccessModal(true);
+      setShowSuccessToast(true);
     } catch (error) {
       console.error("Form submission error:", error);
-      alert("Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.");
+      setShowErrorToast(true);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -181,6 +201,68 @@ export default function Iletisim() {
           </div>
         </div>
       </section>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay" onClick={closeSuccessModal}>
+          <div className="success-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="success-modal-content">
+              <div className="success-icon">✅</div>
+              <h3 className="success-title">Mesajınız Başarıyla Gönderildi!</h3>
+              <p className="success-message">
+                Eğitim danışmanlık talebiniz alınmıştır. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.
+              </p>
+              <div className="success-details">
+                <div className="detail-item">
+                  <span className="detail-icon">⏱️</span>
+                  <span>24 saat içinde dönüş</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-icon">🎯</span>
+                  <span>Ücretsiz danışmanlık</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-icon">📧</span>
+                  <span>E-posta onayı gönderildi</span>
+                </div>
+              </div>
+              <button className="btn btn-primary success-close-btn" onClick={closeSuccessModal}>
+                Anladım
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className="success-toast">
+          <div className="toast-content">
+            <div className="toast-icon">✅</div>
+            <div className="toast-text">
+              <div className="toast-title">Mesajınız gönderildi!</div>
+              <div className="toast-subtitle">En kısa sürede size dönüş yapacağız</div>
+            </div>
+            <button className="toast-close" onClick={() => setShowSuccessToast(false)}>×</button>
+          </div>
+          <div className="toast-progress"></div>
+        </div>
+      )}
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className="error-toast">
+          <div className="toast-content">
+            <div className="toast-icon">❌</div>
+            <div className="toast-text">
+              <div className="toast-title">Hata Oluştu</div>
+              <div className="toast-subtitle">Mesaj gönderilirken bir sorun yaşandı</div>
+            </div>
+            <button className="toast-close" onClick={() => setShowErrorToast(false)}>×</button>
+          </div>
+          <div className="toast-progress error-progress"></div>
+        </div>
+      )}
     </div>
   );
 }
