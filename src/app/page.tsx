@@ -22,7 +22,7 @@ export default function Home() {
           <div className={`hero-content ${isVisible ? 'visible' : ''}`}>
             <div className="hero-badge">
               <span className="badge-icon">🏛️</span>
-              <span className="badge-text">Türkiye'nin Eğitim Teknoloji Lideri</span>
+              <span className="badge-text">Türkiye&apos;nin Eğitim Teknoloji Lideri</span>
             </div>
 
             <h1 className="hero-title">
@@ -78,7 +78,7 @@ export default function Home() {
                 Her öğrencinin benzersiz öğrenme yolculuğunu destekleyen kişiselleştirilmiş
                 eğitim deneyimleri tasarlıyoruz.
               </p>
-            </div>
+              </div>
 
             <div className="value-card">
               <div className="value-icon">🔬</div>
@@ -87,7 +87,7 @@ export default function Home() {
                 Eğitim araştırmaları ve bilimsel verilere dayalı metodolojilerimizle
                 öğrenci başarısını kanıtlanmış şekilde artırıyoruz.
               </p>
-            </div>
+              </div>
 
             <div className="value-card">
               <div className="value-icon">🤝</div>
@@ -96,7 +96,7 @@ export default function Home() {
                 Eğitim kurumları, öğretmenler ve öğrencilerle güçlü iş birlikleri
                 kurarak sürdürülebilir eğitim çözümleri üretiyoruz.
               </p>
-            </div>
+                </div>
 
             <div className="value-card">
               <div className="value-icon">🚀</div>
@@ -307,7 +307,7 @@ export default function Home() {
                 <div className="logo-subtitle">Eğitim Teknolojileri</div>
               </div>
               <p className="footer-description">
-                Türkiye'de eğitim teknolojilerinde öncü ve güvenilir firma olarak,
+                Türkiye&apos;de eğitim teknolojilerinde öncü ve güvenilir firma olarak,
                 yapay zeka destekli eğitim çözümlerimizle geleceğin eğitim
                 paradigmalarını bugün hayata geçiriyoruz.
               </p>

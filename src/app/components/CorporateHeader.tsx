@@ -38,14 +38,12 @@ function CorporateHeader() {
   }, [pathname]);
 
   // Touch event handlers for mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = () => {
     // Prevent default touch behavior for better UX
-    if (isMobile) {
-      e.preventDefault();
-    }
+    // Touch event parameter not needed for this implementation
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = () => {
     // Add slight delay for better touch feedback
     if (isMobile) {
       setTimeout(() => {

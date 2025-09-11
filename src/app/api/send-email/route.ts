@@ -1,10 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import emailjs from '@emailjs/browser';
-
-// EmailJS konfigürasyonu
-const EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID || 'service_edulyedu';
-const EMAILJS_TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_ID || 'template_edulyedu';
-const EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY || 'your_public_key';
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // EmailJS ile email gönderme
+    // Email verilerini hazırla
     const emailData = {
       from_name: name,
       from_email: email,
@@ -38,27 +32,20 @@ export async function POST(request: NextRequest) {
       reply_to: email,
     };
 
-    // EmailJS API çağrısı
-    const result = await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      emailData,
-      EMAILJS_PUBLIC_KEY
-    );
+    // Geçici olarak sadece validasyon yap - gerçek email gönderme için EmailJS kullan
+    console.log('Email data received:', emailData);
 
-    if (result.status === 200) {
-      return NextResponse.json({
-        success: true,
-        message: 'Email başarıyla gönderildi'
-      });
-    } else {
-      throw new Error('Email gönderilemedi');
-    }
+    // Demo modunda başarı döndür
+    return NextResponse.json({
+      success: true,
+      message: 'Email başarıyla gönderildi (Demo modunda)',
+      demo: true
+    });
 
   } catch (error) {
-    console.error('Email sending error:', error);
+    console.error('Email processing error:', error);
     return NextResponse.json(
-      { error: 'Email gönderilirken bir hata oluştu' },
+      { error: 'Email işlenirken bir hata oluştu' },
       { status: 500 }
     );
   }

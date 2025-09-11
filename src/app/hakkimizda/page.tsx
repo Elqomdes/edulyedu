@@ -143,7 +143,7 @@ export default function Hakkimizda() {
                 <div className="goal-content">
                   <h4 className="goal-title">5.000 Okul Ortaklığı</h4>
                   <p className="goal-description">
-                    Türkiye'deki okulların %80'i ile iş birliği yapmak
+                    Türkiye&apos;deki okulların %80&apos;i ile iş birliği yapmak
                   </p>
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default function Hakkimizda() {
                 <div className="goal-content">
                   <h4 className="goal-title">Uluslararası Genişleme</h4>
                   <p className="goal-description">
-                    Avrupa ve Orta Doğu'da lider eğitim teknoloji şirketi olmak
+                    Avrupa ve Orta Doğu&apos;da lider eğitim teknoloji şirketi olmak
                   </p>
                 </div>
               </div>

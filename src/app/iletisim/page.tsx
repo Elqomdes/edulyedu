@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import emailjs from '@emailjs/browser';
 
 // EmailJS konfigürasyonu - Gerçek değerler
@@ -14,9 +13,6 @@ const isValidEmailJSConfig = () => {
   return EMAILJS_SERVICE_ID &&
          EMAILJS_TEMPLATE_ID &&
          EMAILJS_PUBLIC_KEY &&
-         EMAILJS_SERVICE_ID !== 'service_test' &&
-         EMAILJS_TEMPLATE_ID !== 'template_test' &&
-         EMAILJS_PUBLIC_KEY !== 'test_public_key' &&
          EMAILJS_SERVICE_ID.startsWith('service_') &&
          EMAILJS_TEMPLATE_ID.startsWith('template_') &&
          EMAILJS_PUBLIC_KEY.length >= 15; // EmailJS public key'ler genellikle 15-20 karakter arası
@@ -103,35 +99,14 @@ export default function Iletisim() {
         throw new Error('Geçerli bir email adresi giriniz');
       }
 
-      if (!isEmailConfigured) {
-        // EmailJS konfigüre edilmemişse, simüle edilmiş başarı
-        console.log("⚠️ EmailJS not configured properly - using demo mode");
-        console.log("Configuration status:", {
-          serviceId: EMAILJS_SERVICE_ID,
-          templateId: EMAILJS_TEMPLATE_ID,
-          publicKeyLength: EMAILJS_PUBLIC_KEY.length,
-          isValid: isValidEmailJSConfig()
-        });
-
-        // Demo için 3 saniye beklet
-        await new Promise(resolve => setTimeout(resolve, 3000));
-
-        // Başarılı gönderim simülasyonu
-        console.log("📧 DEMO: Simulated email sent:", {
-          from_name: formData.name,
-          from_email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          to_email: 'info@edulyedu.com',
-          status: 'DEMO_MODE'
-        });
-
-        setFormData({ name: "", email: "", subject: "", message: "" });
-        setShowSuccessModal(true);
-        setShowSuccessToast(true);
-
-        return;
-      }
+      // Her zaman gerçek EmailJS kullan (artık demo mode yok)
+      console.log("📧 Attempting to send real email with EmailJS...");
+      console.log("Configuration status:", {
+        serviceId: EMAILJS_SERVICE_ID,
+        templateId: EMAILJS_TEMPLATE_ID,
+        publicKeyLength: EMAILJS_PUBLIC_KEY.length,
+        isValid: isValidEmailJSConfig()
+      });
 
       // Gerçek EmailJS ile email gönderme
       console.log('Attempting to send email with EmailJS...');
@@ -139,38 +114,32 @@ export default function Iletisim() {
       console.log('Template ID:', EMAILJS_TEMPLATE_ID);
 
       const templateParams = {
-        from_name: formData.name,
-        from_email: formData.email,
-        subject: formData.subject,
+        name: formData.name,
         message: formData.message,
-        to_email: 'info@edulyedu.com',
-        reply_to: formData.email,
+        title: formData.subject,
+        email: formData.email,
       };
 
       console.log('Template params:', templateParams);
+      console.log('EmailJS call format:', `emailjs.send("${EMAILJS_SERVICE_ID}","${EMAILJS_TEMPLATE_ID}",${JSON.stringify(templateParams)})`);
 
-      try {
-        const result = await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          templateParams,
-          EMAILJS_PUBLIC_KEY
-        );
+      const result = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
 
-        console.log('EmailJS result:', result);
+      console.log('EmailJS result:', result);
 
-        if (result.status === 200) {
-          // Başarılı gönderim
-          console.log("✅ Email sent successfully:", result);
-          setFormData({ name: "", email: "", subject: "", message: "" });
-          setShowSuccessModal(true);
-          setShowSuccessToast(true);
-        } else {
-          throw new Error(`Email gönderilemedi (Status: ${result.status})`);
-        }
-      } catch (emailjsError) {
-        console.error('❌ EmailJS Error:', emailjsError);
-        throw new Error(`EmailJS hatası: ${emailjsError?.text || emailjsError?.message || 'Bilinmeyen hata'}`);
+      if (result.status === 200) {
+        // Başarılı gönderim
+        console.log("✅ Email sent successfully:", result);
+    setFormData({ name: "", email: "", subject: "", message: "" });
+        setShowSuccessModal(true);
+        setShowSuccessToast(true);
+      } else {
+        throw new Error(`Email gönderilemedi (Status: ${result.status})`);
       }
 
     } catch (error) {
@@ -269,12 +238,7 @@ export default function Iletisim() {
     validateField(name, value);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // handleChange function removed - using handleChangeWithValidation instead
 
   return (
     <div className="contact-page">
