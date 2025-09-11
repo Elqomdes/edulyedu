@@ -9,6 +9,19 @@ const EMAILJS_SERVICE_ID = 'service_7ylpvna';
 const EMAILJS_TEMPLATE_ID = 'template_ypcggf8';
 const EMAILJS_PUBLIC_KEY = 'quNu5gUgfBaEvzkq9';
 
+// Konfigürasyon kontrolü için fonksiyon
+const isValidEmailJSConfig = () => {
+  return EMAILJS_SERVICE_ID &&
+         EMAILJS_TEMPLATE_ID &&
+         EMAILJS_PUBLIC_KEY &&
+         EMAILJS_SERVICE_ID !== 'service_test' &&
+         EMAILJS_TEMPLATE_ID !== 'template_test' &&
+         EMAILJS_PUBLIC_KEY !== 'test_public_key' &&
+         EMAILJS_SERVICE_ID.startsWith('service_') &&
+         EMAILJS_TEMPLATE_ID.startsWith('template_') &&
+         EMAILJS_PUBLIC_KEY.length >= 15; // EmailJS public key'ler genellikle 15-20 karakter arası
+};
+
 export default function Iletisim() {
   const [formData, setFormData] = useState({
     name: "",
@@ -32,14 +45,33 @@ export default function Iletisim() {
 
   // EmailJS konfigürasyonunu kontrol et ve başlat
   useEffect(() => {
-    const isConfigured = EMAILJS_SERVICE_ID !== 'service_test' &&
-                        EMAILJS_TEMPLATE_ID !== 'template_test' &&
-                        EMAILJS_PUBLIC_KEY !== 'test_public_key';
-
+    const isConfigured = isValidEmailJSConfig();
     setIsEmailConfigured(isConfigured);
 
+    console.log('EmailJS Configuration Check:', {
+      serviceId: EMAILJS_SERVICE_ID,
+      templateId: EMAILJS_TEMPLATE_ID,
+      publicKey: EMAILJS_PUBLIC_KEY ? '***' + EMAILJS_PUBLIC_KEY.slice(-4) : 'not set',
+      isConfigured: isConfigured
+    });
+
     if (isConfigured) {
-      emailjs.init(EMAILJS_PUBLIC_KEY);
+      try {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        console.log('✅ EmailJS initialized successfully');
+        console.log('📧 Ready to send emails to: info@edulyedu.com');
+      } catch (initError) {
+        console.error('❌ EmailJS initialization failed:', initError);
+        setIsEmailConfigured(false);
+      }
+    } else {
+      console.log('⚠️ EmailJS not configured properly - using demo mode');
+      console.log('Expected format: service_*, template_*, 15+ char public key');
+      console.log('Current values:', {
+        serviceId: EMAILJS_SERVICE_ID,
+        templateId: EMAILJS_TEMPLATE_ID,
+        publicKeyLength: EMAILJS_PUBLIC_KEY.length
+      });
     }
   }, []);
 
@@ -73,18 +105,25 @@ export default function Iletisim() {
 
       if (!isEmailConfigured) {
         // EmailJS konfigüre edilmemişse, simüle edilmiş başarı
-        console.log("EmailJS not configured - Simulating success for demo");
+        console.log("⚠️ EmailJS not configured properly - using demo mode");
+        console.log("Configuration status:", {
+          serviceId: EMAILJS_SERVICE_ID,
+          templateId: EMAILJS_TEMPLATE_ID,
+          publicKeyLength: EMAILJS_PUBLIC_KEY.length,
+          isValid: isValidEmailJSConfig()
+        });
 
-        // Demo için 2 saniye beklet
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Demo için 3 saniye beklet
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // Başarılı gönderim simülasyonu
-        console.log("Simulated email sent:", {
+        console.log("📧 DEMO: Simulated email sent:", {
           from_name: formData.name,
           from_email: formData.email,
           subject: formData.subject,
           message: formData.message,
           to_email: 'info@edulyedu.com',
+          status: 'DEMO_MODE'
         });
 
         setFormData({ name: "", email: "", subject: "", message: "" });
@@ -95,6 +134,10 @@ export default function Iletisim() {
       }
 
       // Gerçek EmailJS ile email gönderme
+      console.log('Attempting to send email with EmailJS...');
+      console.log('Service ID:', EMAILJS_SERVICE_ID);
+      console.log('Template ID:', EMAILJS_TEMPLATE_ID);
+
       const templateParams = {
         from_name: formData.name,
         from_email: formData.email,
@@ -104,21 +147,30 @@ export default function Iletisim() {
         reply_to: formData.email,
       };
 
-      const result = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_PUBLIC_KEY
-      );
+      console.log('Template params:', templateParams);
 
-      if (result.status === 200) {
-        // Başarılı gönderim
-        console.log("Email sent successfully:", result);
-        setFormData({ name: "", email: "", subject: "", message: "" });
-        setShowSuccessModal(true);
-        setShowSuccessToast(true);
-      } else {
-        throw new Error(`Email gönderilemedi (Status: ${result.status})`);
+      try {
+        const result = await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          templateParams,
+          EMAILJS_PUBLIC_KEY
+        );
+
+        console.log('EmailJS result:', result);
+
+        if (result.status === 200) {
+          // Başarılı gönderim
+          console.log("✅ Email sent successfully:", result);
+          setFormData({ name: "", email: "", subject: "", message: "" });
+          setShowSuccessModal(true);
+          setShowSuccessToast(true);
+        } else {
+          throw new Error(`Email gönderilemedi (Status: ${result.status})`);
+        }
+      } catch (emailjsError) {
+        console.error('❌ EmailJS Error:', emailjsError);
+        throw new Error(`EmailJS hatası: ${emailjsError?.text || emailjsError?.message || 'Bilinmeyen hata'}`);
       }
 
     } catch (error) {
