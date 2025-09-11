@@ -22,18 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Email verilerini hazırla
-    const emailData = {
-      from_name: name,
-      from_email: email,
-      subject: subject,
-      message: message,
-      to_email: 'info@edulyedu.com',
-      reply_to: email,
-    };
-
     // Geçici olarak sadece validasyon yap - gerçek email gönderme için EmailJS kullan
-    console.log('Email data received:', emailData);
 
     // Demo modunda başarı döndür
     return NextResponse.json({

@@ -100,28 +100,13 @@ export default function Iletisim() {
       }
 
       // Her zaman gerçek EmailJS kullan (artık demo mode yok)
-      console.log("📧 Attempting to send real email with EmailJS...");
-      console.log("Configuration status:", {
-        serviceId: EMAILJS_SERVICE_ID,
-        templateId: EMAILJS_TEMPLATE_ID,
-        publicKeyLength: EMAILJS_PUBLIC_KEY.length,
-        isValid: isValidEmailJSConfig()
-      });
-
-      // Gerçek EmailJS ile email gönderme
-      console.log('Attempting to send email with EmailJS...');
-      console.log('Service ID:', EMAILJS_SERVICE_ID);
-      console.log('Template ID:', EMAILJS_TEMPLATE_ID);
-
+      // EmailJS ile email gönderme
       const templateParams = {
         name: formData.name,
         message: formData.message,
         title: formData.subject,
         email: formData.email,
       };
-
-      console.log('Template params:', templateParams);
-      console.log('EmailJS call format:', `emailjs.send("${EMAILJS_SERVICE_ID}","${EMAILJS_TEMPLATE_ID}",${JSON.stringify(templateParams)})`);
 
       const result = await emailjs.send(
         EMAILJS_SERVICE_ID,
