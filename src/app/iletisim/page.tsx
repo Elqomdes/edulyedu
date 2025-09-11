@@ -4,15 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import emailjs from '@emailjs/browser';
 
-// EmailJS konfigürasyonu - Test amaçlı geçici değerler
-// Gerçek kullanım için bu değerleri değiştirin:
-// 1. EmailJS hesabınıza giriş yapın: https://www.emailjs.com/
-// 2. Dashboard'dan Service ID'yi alın
-// 3. Email Templates bölümünden template oluşturun
-// 4. Account > General bölümünden Public Key'i alın
-const EMAILJS_SERVICE_ID = 'service_test';
-const EMAILJS_TEMPLATE_ID = 'template_test';
-const EMAILJS_PUBLIC_KEY = 'test_public_key';
+// EmailJS konfigürasyonu - Gerçek değerler
+const EMAILJS_SERVICE_ID = 'service_7ylpvna';
+const EMAILJS_TEMPLATE_ID = 'template_ypcggf8';
+const EMAILJS_PUBLIC_KEY = 'quNu5gUgfBaEvzkq9';
 
 export default function Iletisim() {
   const [formData, setFormData] = useState({
