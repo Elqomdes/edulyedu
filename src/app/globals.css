@@ -5279,6 +5279,152 @@ a:hover {
   }
 }
 
+/* ========================================
+   FORM VALIDATION & WARNINGS
+   ======================================== */
+
+/* EmailJS Configuration Warning */
+.email-config-warning {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.warning-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warning-content {
+  flex: 1;
+}
+
+.warning-title {
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
+.warning-text {
+  color: #78350f;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.warning-text a {
+  color: #b45309;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.warning-text a:hover {
+  color: #92400e;
+}
+
+/* Form Validation Styles */
+.form-input-error,
+.form-textarea-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-error::before {
+  content: '⚠️';
+  font-size: 0.9rem;
+}
+
+/* Enhanced Form Focus States */
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--color4);
+  box-shadow: 0 0 0 3px rgba(76, 97, 116, 0.1);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.form-input-error:focus,
+.form-textarea-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* Loading State Enhancements */
+.contact-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.contact-submit-btn:disabled:hover {
+  transform: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Success Animation for Form */
+@keyframes formSuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.contact-form.success {
+  animation: formSuccess 0.6s ease-out;
+}
+
+/* Mobile Form Enhancements */
+@media (max-width: 768px) {
+  .email-config-warning {
+    padding: 14px;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  .warning-icon {
+    font-size: 1.3rem;
+  }
+
+  .warning-title {
+    font-size: 0.9rem;
+  }
+
+  .warning-text {
+    font-size: 0.8rem;
+  }
+
+  .field-error {
+    font-size: 0.75rem;
+    margin-top: 6px;
+  }
+
+  .form-input-error,
+  .form-textarea-error {
+    border-width: 2px;
+  }
+}
+
 /* Mobile Typography Optimizations */
 @media (max-width: 768px) {
   /* Responsive Typography */

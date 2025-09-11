@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import emailjs from '@emailjs/browser';
 
-// EmailJS konfigürasyonu - Gerçek değerlerle değiştirin
+// EmailJS konfigürasyonu - Test amaçlı geçici değerler
+// Gerçek kullanım için bu değerleri değiştirin:
 // 1. EmailJS hesabınıza giriş yapın: https://www.emailjs.com/
 // 2. Dashboard'dan Service ID'yi alın
 // 3. Email Templates bölümünden template oluşturun
 // 4. Account > General bölümünden Public Key'i alın
-const EMAILJS_SERVICE_ID = 'service_your_service_id';
-const EMAILJS_TEMPLATE_ID = 'template_your_template_id';
-const EMAILJS_PUBLIC_KEY = 'your_public_key';
+const EMAILJS_SERVICE_ID = 'service_test';
+const EMAILJS_TEMPLATE_ID = 'template_test';
+const EMAILJS_PUBLIC_KEY = 'test_public_key';
 
 export default function Iletisim() {
   const [formData, setFormData] = useState({
@@ -25,10 +26,26 @@ export default function Iletisim() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isEmailConfigured, setIsEmailConfigured] = useState(true);
+  const [fieldErrors, setFieldErrors] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
 
-  // EmailJS'i başlat
+  // EmailJS konfigürasyonunu kontrol et ve başlat
   useEffect(() => {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+    const isConfigured = EMAILJS_SERVICE_ID !== 'service_test' &&
+                        EMAILJS_TEMPLATE_ID !== 'template_test' &&
+                        EMAILJS_PUBLIC_KEY !== 'test_public_key';
+
+    setIsEmailConfigured(isConfigured);
+
+    if (isConfigured) {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+    }
   }, []);
 
   // Toast mesajlarını otomatik kapat
@@ -48,7 +65,41 @@ export default function Iletisim() {
     setIsSubmitting(true);
 
     try {
-      // EmailJS ile email gönderme
+      // Form validasyonu
+      if (!formData.name.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) {
+        throw new Error('Lütfen tüm alanları doldurun');
+      }
+
+      // Email format kontrolü
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error('Geçerli bir email adresi giriniz');
+      }
+
+      if (!isEmailConfigured) {
+        // EmailJS konfigüre edilmemişse, simüle edilmiş başarı
+        console.log("EmailJS not configured - Simulating success for demo");
+
+        // Demo için 2 saniye beklet
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Başarılı gönderim simülasyonu
+        console.log("Simulated email sent:", {
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          to_email: 'info@edulyedu.com',
+        });
+
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setShowSuccessModal(true);
+        setShowSuccessToast(true);
+
+        return;
+      }
+
+      // Gerçek EmailJS ile email gönderme
       const templateParams = {
         from_name: formData.name,
         from_email: formData.email,
@@ -72,12 +123,38 @@ export default function Iletisim() {
         setShowSuccessModal(true);
         setShowSuccessToast(true);
       } else {
-        throw new Error('Email gönderilemedi');
+        throw new Error(`Email gönderilemedi (Status: ${result.status})`);
       }
 
     } catch (error) {
       console.error("Email sending error:", error);
+
+      // Hata mesajını kullanıcı dostu hale getir
+      let errorMessage = 'Mesaj gönderilirken bir sorun yaşandı';
+
+      if (error instanceof Error) {
+        if (error.message.includes('Lütfen tüm alanları')) {
+          errorMessage = error.message;
+        } else if (error.message.includes('Geçerli bir email')) {
+          errorMessage = error.message;
+        } else if (error.message.includes('EmailJS')) {
+          errorMessage = 'Email servisi geçici olarak kullanılamıyor. Lütfen daha sonra tekrar deneyin.';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'İnternet bağlantınızı kontrol edip tekrar deneyin.';
+        }
+      }
+
+      // Özel hata mesajını ayarla ve toast'u göster
+      setErrorMessage(errorMessage);
       setShowErrorToast(true);
+
+      // Console'a detaylı hata bilgisi
+      console.error('Form submission failed:', {
+        error: errorMessage,
+        formData: formData,
+        isConfigured: isEmailConfigured
+      });
+
     } finally {
       setIsSubmitting(false);
     }
@@ -85,6 +162,64 @@ export default function Iletisim() {
 
   const closeSuccessModal = () => {
     setShowSuccessModal(false);
+  };
+
+  // Form alanı validation fonksiyonu
+  const validateField = (name: string, value: string) => {
+    let error = '';
+
+    switch (name) {
+      case 'name':
+        if (!value.trim()) {
+          error = 'Ad Soyad zorunludur';
+        } else if (value.trim().length < 2) {
+          error = 'Ad Soyad en az 2 karakter olmalıdır';
+        }
+        break;
+      case 'email':
+        if (!value.trim()) {
+          error = 'E-posta zorunludur';
+        } else {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            error = 'Geçerli bir e-posta adresi giriniz';
+          }
+        }
+        break;
+      case 'subject':
+        if (!value.trim()) {
+          error = 'Konu zorunludur';
+        } else if (value.trim().length < 3) {
+          error = 'Konu en az 3 karakter olmalıdır';
+        }
+        break;
+      case 'message':
+        if (!value.trim()) {
+          error = 'Mesaj zorunludur';
+        } else if (value.trim().length < 10) {
+          error = 'Mesaj en az 10 karakter olmalıdır';
+        }
+        break;
+    }
+
+    setFieldErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
+
+    return error === '';
+  };
+
+  // Input change handler with validation
+  const handleChangeWithValidation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Real-time validation
+    validateField(name, value);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -118,6 +253,21 @@ export default function Iletisim() {
                 </p>
               </div>
 
+              {/* EmailJS Konfigürasyon Uyarısı */}
+              {!isEmailConfigured && (
+                <div className="email-config-warning">
+                  <div className="warning-icon">⚠️</div>
+                  <div className="warning-content">
+                    <div className="warning-title">Email Servisi Yapılandırılmamış</div>
+                    <div className="warning-text">
+                      Şu anda demo modunda çalışıyorsunuz. Gerçek email gönderme için
+                      <a href="https://www.emailjs.com/" target="_blank" rel="noopener noreferrer">
+                        EmailJS hesabınızı</a> yapılandırın.
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-row">
                   <div className="form-group">
@@ -128,11 +278,12 @@ export default function Iletisim() {
                       name="name"
                       required
                       value={formData.name}
-                      onChange={handleChange}
-                      className="form-input"
+                      onChange={handleChangeWithValidation}
+                      className={`form-input ${fieldErrors.name ? 'form-input-error' : ''}`}
                       placeholder="Ad Soyad"
                       disabled={isSubmitting}
                     />
+                    {fieldErrors.name && <div className="field-error">{fieldErrors.name}</div>}
                   </div>
                   <div className="form-group">
                     <label htmlFor="email" className="form-label">E-posta *</label>
@@ -142,11 +293,12 @@ export default function Iletisim() {
                       name="email"
                       required
                       value={formData.email}
-                      onChange={handleChange}
-                      className="form-input"
+                      onChange={handleChangeWithValidation}
+                      className={`form-input ${fieldErrors.email ? 'form-input-error' : ''}`}
                       placeholder="E-posta"
                       disabled={isSubmitting}
                     />
+                    {fieldErrors.email && <div className="field-error">{fieldErrors.email}</div>}
                   </div>
                 </div>
 
@@ -158,11 +310,12 @@ export default function Iletisim() {
                     name="subject"
                     required
                     value={formData.subject}
-                    onChange={handleChange}
-                    className="form-input"
+                    onChange={handleChangeWithValidation}
+                    className={`form-input ${fieldErrors.subject ? 'form-input-error' : ''}`}
                     placeholder="Konu"
                     disabled={isSubmitting}
                   />
+                  {fieldErrors.subject && <div className="field-error">{fieldErrors.subject}</div>}
                 </div>
 
                 <div className="form-group">
@@ -172,12 +325,13 @@ export default function Iletisim() {
                     name="message"
                     required
                     value={formData.message}
-                    onChange={handleChange}
-                    className="form-textarea"
+                    onChange={handleChangeWithValidation}
+                    className={`form-textarea ${fieldErrors.message ? 'form-textarea-error' : ''}`}
                     placeholder="Mesajınız"
                     rows={6}
                     disabled={isSubmitting}
                   />
+                  {fieldErrors.message && <div className="field-error">{fieldErrors.message}</div>}
                 </div>
 
                 <button
@@ -294,7 +448,7 @@ export default function Iletisim() {
             <div className="toast-icon">❌</div>
             <div className="toast-text">
               <div className="toast-title">Hata Oluştu</div>
-              <div className="toast-subtitle">Mesaj gönderilirken bir sorun yaşandı</div>
+              <div className="toast-subtitle">{errorMessage || 'Mesaj gönderilirken bir sorun yaşandı'}</div>
             </div>
             <button className="toast-close" onClick={() => setShowErrorToast(false)}>×</button>
           </div>
