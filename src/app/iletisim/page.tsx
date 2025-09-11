@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import emailjs from '@emailjs/browser';
+
+// EmailJS konfigürasyonu - Gerçek değerlerle değiştirin
+// 1. EmailJS hesabınıza giriş yapın: https://www.emailjs.com/
+// 2. Dashboard'dan Service ID'yi alın
+// 3. Email Templates bölümünden template oluşturun
+// 4. Account > General bölümünden Public Key'i alın
+const EMAILJS_SERVICE_ID = 'service_your_service_id';
+const EMAILJS_TEMPLATE_ID = 'template_your_template_id';
+const EMAILJS_PUBLIC_KEY = 'your_public_key';
 
 export default function Iletisim() {
   const [formData, setFormData] = useState({
@@ -15,6 +25,11 @@ export default function Iletisim() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
+
+  // EmailJS'i başlat
+  useEffect(() => {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+  }, []);
 
   // Toast mesajlarını otomatik kapat
   useEffect(() => {
@@ -33,12 +48,35 @@ export default function Iletisim() {
     setIsSubmitting(true);
 
     try {
-      console.log("Form submitted:", formData);
-      setFormData({ name: "", email: "", subject: "", message: "" });
-      setShowSuccessModal(true);
-      setShowSuccessToast(true);
+      // EmailJS ile email gönderme
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        to_email: 'info@edulyedu.com',
+        reply_to: formData.email,
+      };
+
+      const result = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+
+      if (result.status === 200) {
+        // Başarılı gönderim
+        console.log("Email sent successfully:", result);
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setShowSuccessModal(true);
+        setShowSuccessToast(true);
+      } else {
+        throw new Error('Email gönderilemedi');
+      }
+
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error("Email sending error:", error);
       setShowErrorToast(true);
     } finally {
       setIsSubmitting(false);

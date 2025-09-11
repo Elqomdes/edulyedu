@@ -1,0 +1,65 @@
+{
+  "name": "Eduly Eğitim Teknolojileri",
+  "short_name": "Eduly",
+  "description": "Eğitim teknolojileri alanında yenilikçi çözümler sunan lider firma",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c2826",
+  "theme_color": "#559aa0",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "tr-TR",
+  "categories": ["education", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "İletişim",
+      "short_name": "İletişim",
+      "description": "Bizimle iletişime geçin",
+      "url": "/iletisim",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Hakkımızda",
+      "short_name": "Hakkımızda",
+      "description": "Şirketimiz hakkında bilgi alın",
+      "url": "/hakkimizda",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

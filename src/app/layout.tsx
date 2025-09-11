@@ -11,6 +11,34 @@ export const metadata: Metadata = {
     maximumScale: 1,
     userScalable: false,
   },
+  icons: {
+    icon: [
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+        sizes: 'any',
+      }
+    ],
+    shortcut: '/icon.svg',
+    apple: [
+      {
+        url: '/icon.svg',
+        sizes: '180x180',
+        type: 'image/svg+xml',
+      }
+    ],
+    other: [
+      {
+        rel: 'android-chrome-192x192',
+        url: '/icon.svg',
+      },
+      {
+        rel: 'android-chrome-512x512',
+        url: '/icon.svg',
+      }
+    ]
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
